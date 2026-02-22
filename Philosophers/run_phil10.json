@@ -1,0 +1,117 @@
+{
+    "copyright_notice": "FDR Version 4.2.7 copyright 2016 Oxford University Innovation Ltd. All Rights Reserved.",
+    "license_type": "Academic license for non-commercial use only",
+    "results": [
+        {
+            "assertion_string": "System :[deadlock free [F]]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 0,
+            "visited_states": 6067403,
+            "visited_transitions": 95176648,
+            "visited_plys": 20,
+            "counterexamples": [
+                {
+                    "type": "deadlock",
+                    "implementation_behaviour": {
+                        "machine_name": "System",
+                        "type": "min_acceptance",
+                        "acceptance": [],
+                        "trace": [
+                            27,
+                            12,
+                            37,
+                            8,
+                            49,
+                            30,
+                            36,
+                            11,
+                            9,
+                            47,
+                            35,
+                            7,
+                            4,
+                            32,
+                            24,
+                            45,
+                            3,
+                            6,
+                            5,
+                            10
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "assertion_string": "System :[deadlock free [F]] :[partial order reduce]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 0,
+            "visited_states": 39,
+            "visited_transitions": 87,
+            "visited_plys": 20,
+            "counterexamples": [
+                {
+                    "type": "deadlock",
+                    "implementation_behaviour": {
+                        "type": "min_acceptance",
+                        "acceptance": [],
+                        "trace": [
+                            49,
+                            47,
+                            45,
+                            37,
+                            36,
+                            35,
+                            30,
+                            32,
+                            27,
+                            24,
+                            12,
+                            10,
+                            11,
+                            9,
+                            8,
+                            6,
+                            7,
+                            5,
+                            4,
+                            3
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "print_statement_results": [],
+    "file_name": "run_phil10.csp",
+    "event_map": {
+        "3": "pickFork.F.0",
+        "4": "pickFork.F.1",
+        "5": "pickFork.F.2",
+        "6": "pickFork.F.3",
+        "7": "pickFork.F.4",
+        "8": "pickFork.F.5",
+        "9": "pickFork.F.6",
+        "10": "pickFork.F.7",
+        "11": "pickFork.F.8",
+        "12": "pickFork.F.9",
+        "24": "hungry.P.1",
+        "27": "hungry.P.10",
+        "30": "hungry.P.9",
+        "32": "hungry.P.8",
+        "35": "hungry.P.5",
+        "36": "hungry.P.7",
+        "37": "hungry.P.6",
+        "45": "hungry.P.4",
+        "47": "hungry.P.3",
+        "49": "hungry.P.2"
+    },
+    "warnings": [],
+    "errors": [],
+    "time": 4.053277875005733,
+    "parameters": {
+        "phil": 10
+    }
+}

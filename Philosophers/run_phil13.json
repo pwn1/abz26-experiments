@@ -1,0 +1,135 @@
+{
+    "copyright_notice": "FDR Version 4.2.7 copyright 2016 Oxford University Innovation Ltd. All Rights Reserved.",
+    "license_type": "Academic license for non-commercial use only",
+    "results": [
+        {
+            "assertion_string": "System :[deadlock free [F]]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 0,
+            "visited_states": 761791638,
+            "visited_transitions": 15418186708,
+            "visited_plys": 26,
+            "counterexamples": [
+                {
+                    "type": "deadlock",
+                    "implementation_behaviour": {
+                        "machine_name": "System",
+                        "type": "min_acceptance",
+                        "acceptance": [],
+                        "trace": [
+                            55,
+                            33,
+                            15,
+                            37,
+                            63,
+                            41,
+                            11,
+                            48,
+                            43,
+                            10,
+                            61,
+                            5,
+                            4,
+                            35,
+                            8,
+                            30,
+                            7,
+                            3,
+                            39,
+                            45,
+                            58,
+                            9,
+                            6,
+                            14,
+                            13,
+                            12
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "assertion_string": "System :[deadlock free [F]] :[partial order reduce]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 0,
+            "visited_states": 35,
+            "visited_transitions": 69,
+            "visited_plys": 26,
+            "counterexamples": [
+                {
+                    "type": "deadlock",
+                    "implementation_behaviour": {
+                        "type": "min_acceptance",
+                        "acceptance": [],
+                        "trace": [
+                            63,
+                            61,
+                            58,
+                            55,
+                            48,
+                            45,
+                            43,
+                            41,
+                            39,
+                            37,
+                            35,
+                            33,
+                            30,
+                            14,
+                            15,
+                            12,
+                            13,
+                            11,
+                            9,
+                            10,
+                            8,
+                            7,
+                            6,
+                            4,
+                            5,
+                            3
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "print_statement_results": [],
+    "file_name": "run_phil13.csp",
+    "event_map": {
+        "3": "pickFork.F.0",
+        "4": "pickFork.F.1",
+        "5": "pickFork.F.2",
+        "6": "pickFork.F.3",
+        "7": "pickFork.F.4",
+        "8": "pickFork.F.5",
+        "9": "pickFork.F.6",
+        "10": "pickFork.F.7",
+        "11": "pickFork.F.8",
+        "12": "pickFork.F.9",
+        "13": "pickFork.F.10",
+        "14": "pickFork.F.11",
+        "15": "pickFork.F.12",
+        "30": "hungry.P.1",
+        "33": "hungry.P.13",
+        "35": "hungry.P.12",
+        "37": "hungry.P.11",
+        "39": "hungry.P.10",
+        "41": "hungry.P.9",
+        "43": "hungry.P.8",
+        "45": "hungry.P.7",
+        "48": "hungry.P.6",
+        "55": "hungry.P.5",
+        "58": "hungry.P.4",
+        "61": "hungry.P.3",
+        "63": "hungry.P.2"
+    },
+    "warnings": [],
+    "errors": [],
+    "time": 191.86418201198103,
+    "parameters": {
+        "phil": 13
+    }
+}

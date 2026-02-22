@@ -1,0 +1,75 @@
+{
+    "copyright_notice": "FDR Version 4.2.7 copyright 2016 Oxford University Innovation Ltd. All Rights Reserved.",
+    "license_type": "Academic license for non-commercial use only",
+    "results": [
+        {
+            "assertion_string": "System :[deadlock free [F]]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 0,
+            "visited_states": 78,
+            "visited_transitions": 379,
+            "visited_plys": 6,
+            "counterexamples": [
+                {
+                    "type": "deadlock",
+                    "implementation_behaviour": {
+                        "machine_name": "System",
+                        "type": "min_acceptance",
+                        "acceptance": [],
+                        "trace": [
+                            12,
+                            14,
+                            5,
+                            10,
+                            4,
+                            3
+                        ]
+                    }
+                }
+            ]
+        },
+        {
+            "assertion_string": "System :[deadlock free [F]] :[partial order reduce]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 0,
+            "visited_states": 8,
+            "visited_transitions": 16,
+            "visited_plys": 6,
+            "counterexamples": [
+                {
+                    "type": "deadlock",
+                    "implementation_behaviour": {
+                        "type": "min_acceptance",
+                        "acceptance": [],
+                        "trace": [
+                            14,
+                            12,
+                            10,
+                            5,
+                            4,
+                            3
+                        ]
+                    }
+                }
+            ]
+        }
+    ],
+    "print_statement_results": [],
+    "file_name": "run_phil3.csp",
+    "event_map": {
+        "3": "pickFork.F.0",
+        "4": "pickFork.F.1",
+        "5": "pickFork.F.2",
+        "10": "hungry.P.1",
+        "12": "hungry.P.3",
+        "14": "hungry.P.2"
+    },
+    "warnings": [],
+    "errors": [],
+    "time": 1.316882432991406,
+    "parameters": {
+        "phil": 3
+    }
+}

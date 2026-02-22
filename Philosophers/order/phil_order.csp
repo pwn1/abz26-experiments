@@ -1,0 +1,88 @@
+-- In this model, the philosophers have four states: 
+-- {Thinking (1), 
+--  Hungry (with no forks) (2),
+--  Hungry and holding left fork (3), 
+--  Eating and holding both forks (4)}. 
+
+-- The transitions for progression between these states are: 
+-- {Becoming hungry (1), 
+--  Picking up left fork (2), 
+--  Picking up right fork (3), 
+--  Putting down both forks (4)}. 
+
+-- There are also repeater transitions allowing states to be repeated 
+-- {Thinking to Thinking (5), 
+--  Hungry to Hungry (6), 
+--  Picking up left fork to Picking up left fork (7), 
+--  Eating to Eating (8)}. 
+
+-- Parameter
+PHILOSOPHERS = 2
+-- Base case
+FORKS = if PHILOSOPHERS == 1 then 2 else PHILOSOPHERS
+
+-- Data types for convenience
+datatype PhilID = P.{1..PHILOSOPHERS}
+datatype ForkID = F.{0..FORKS-1}
+
+-- Channels
+--
+-- In principle, some of the channels, such as 'think', 'hungry' and 'eat'
+-- could be dropped without loss of generality if the aim is to identify
+-- potential deadlocks here.
+channel think, hungry, eat : PhilID
+channel pickFork, dropFork : ForkID
+
+-- Functions that return, for a philosopher, the fork on left/right.
+leftFork(P.p) = F.(p-1)%(FORKS)
+rightFork(P.p) = F.(p)%(FORKS)
+
+-- Philosopher process: initially thinking.
+Phil(p) = PThinking(p)
+
+-- When thinking can think, or become hungry.
+PThinking(p) = think.p -> PThinking(p)
+               []
+               hungry.p -> PHungry(p)
+
+-- When hungry, can keep being hungry or pick a fork to the left.
+PHungry(p) = hungry.p -> PHungry(p)
+             [] 
+             pickFork.leftFork(p) -> PHLeftFork(p)
+                 
+-- When fork to the left picked up, can pick fork to the right.
+PHLeftFork(p) = -- hungry.p -> PHLeftFork(p) -- commented out
+                -- []
+                pickFork.rightFork(p) -> PEating(p)
+
+-- When both picked up, can eat and keep eating, or drop the forks
+PEating(p) = eat.p -> PEating(p)
+             []
+             (PDropForks(p) ; PThinking(p))
+             
+-- Order of dropping forks can be either, so here we use interleaving to allow
+-- both orders, first left and then right, or first right and then left.
+PDropForks(p) = dropFork.leftFork(p) -> SKIP ||| dropFork.rightFork(p) -> SKIP
+
+-- Process modelling a fork
+Fork(f) = FNotHeld(f)
+-- Initially not held
+FNotHeld(f) = pickFork.f -> FHeld(f)
+-- If held, can drop it
+FHeld(f) = dropFork.f -> FNotHeld(f)
+
+-- Phils interleaving of Philosophers
+Phils = ||| x : PhilID @ Phil(x)
+-- Forks interleaving of Forks
+Forks = ||| x : ForkID @ Fork(x)
+
+-- System is their parallel composition synchronising on pickFork and dropFork,
+-- so that a fork can be picked up/dropped by any philosopher that requests it,
+-- whenever it is held or not held, respectively. Note that here we do not
+-- restrict who can pick which fork as that is instead guaranteed by construction
+-- above in the definition of PHil: each philosopher can only pick the fork to
+-- its left or right.
+System = Phils [| {|pickFork,dropFork|} |] Forks
+
+-- Assertions to check for deadlock freedom
+assert System :[deadlock free [F]] :[partial order reduce] 

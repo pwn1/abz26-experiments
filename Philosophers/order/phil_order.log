@@ -1,0 +1,12 @@
+2026-02-17 23:09:38,955 - INFO - === Starting Sweep at Index 0 of 5 ===
+2026-02-18 00:32:53,058 - INFO - run_phil600.csp: [red]FAIL[/] (4994.09s)
+2026-02-18 00:32:53,073 - INFO - PROGRESS: 1/5 (20.0%) complete.
+2026-02-18 03:05:47,602 - INFO - run_phil700.csp: [red]FAIL[/] (9174.51s)
+2026-02-18 03:05:47,623 - INFO - PROGRESS: 2/5 (40.0%) complete.
+2026-02-18 07:14:48,534 - INFO - run_phil800.csp: [red]FAIL[/] (14940.89s)
+2026-02-18 07:14:48,555 - INFO - PROGRESS: 3/5 (60.0%) complete.
+2026-02-18 13:48:48,895 - INFO - run_phil900.csp: [red]FAIL[/] (23640.32s)
+2026-02-18 13:48:48,913 - INFO - PROGRESS: 4/5 (80.0%) complete.
+2026-02-18 23:44:23,216 - INFO - run_phil1000.csp: [red]FAIL[/] (35734.29s)
+2026-02-18 23:44:23,237 - INFO - PROGRESS: 5/5 (100.0%) complete.
+2026-02-18 23:44:23,245 - INFO - === Sweep Complete ===

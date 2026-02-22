@@ -1,0 +1,10 @@
+2026-02-11 18:14:26,915 - INFO - === Starting Sweep at Index 6 of 10 ===
+2026-02-11 18:25:29,567 - INFO - run_av5_lv1_alpha8_K1_D200.csp: [green]PASS[/] (662.64s)
+2026-02-11 18:25:29,573 - INFO - PROGRESS: 7/10 (70.0%) complete.
+2026-02-11 18:40:22,423 - INFO - run_av5_lv1_alpha8_K1_D400.csp: [green]PASS[/] (892.84s)
+2026-02-11 18:40:22,436 - INFO - PROGRESS: 8/10 (80.0%) complete.
+2026-02-11 19:03:36,453 - INFO - run_av5_lv1_alpha8_K1_D800.csp: [green]PASS[/] (1394.00s)
+2026-02-11 19:03:36,465 - INFO - PROGRESS: 9/10 (90.0%) complete.
+2026-02-11 19:30:50,616 - INFO - run_av5_lv1_alpha8_K1_D1000.csp: [green]PASS[/] (1634.13s)
+2026-02-11 19:30:50,631 - INFO - PROGRESS: 10/10 (100.0%) complete.
+2026-02-11 19:30:50,640 - INFO - === Sweep Complete ===

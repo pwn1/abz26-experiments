@@ -1,0 +1,15 @@
+/Mathematics.csp
+/Mathematics_coreassertions.csp
+/file_AggregationSw.csp
+/file_AggregationSw_coreassertions.csp
+/file_aggregation.csp
+/file_aggregation_coreassertions.csp
+/file_communication.csp
+/file_communicationC.csp
+/file_communicationC_coreassertions.csp
+/file_communication_coreassertions.csp
+/file_movementC.csp
+/file_movementC_coreassertions.csp
+/instantiations.csp
+/main_assertions.csp
+/main_assertions.json

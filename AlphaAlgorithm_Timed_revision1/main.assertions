@@ -1,0 +1,58 @@
+import set_toolkit::*    
+import sequence_toolkit::*
+timed csp Instantiations associated to AggregationSoftware csp-begin
+
+-- STATEMACHINE CONSTANTS
+
+const_Movement_av = 1
+const_Movement_K = 1
+const_Movement_alpha = 1
+const_Movement_lv = 1
+const_aux_D = 1
+const_Movement_MB = Div(360,const_Movement_av,core_real)+const_aux_D -- this is defined in terms of av and core_real
+
+-- BASIC TYPES
+
+-- generate string
+nametype core_string = LSeq(Char,2)
+
+-- Types
+
+nametype ID = {0}
+nametype core_nat = { 0, const_Movement_alpha - 1, const_Movement_alpha, const_Movement_alpha + 1}
+nametype core_boolean = Bool
+
+-- generate real -- defined in terms of 'av' and 'lv'
+nametype core_real = { 0, - const_Movement_av, const_Movement_av, - const_Movement_lv, const_Movement_lv}
+
+-- generate int
+nametype core_int = { 0 }
+
+-- CLOCKS, needs to be at least [0,MB+1]
+nametype core_clock_type = {0..const_Movement_MB+1}
+
+-- FUNCTIONS
+
+-- generate Mathematics_floor
+Mathematics_floor(x) = x
+
+-- Closed arithmetic operations
+Plus(e1,e2,T) = if member(e1+e2,T) then e1+e2 else e1
+Div(e1,e2,T) = if member(e1/e2,T) then e1/e2 else e1
+Neg(e1,T) = if member(-e1,T) then -e1 else e1
+Mult(e1,e2,T) = if member(e1*e2,T) then e1*e2 else e1
+Modulus(e1,e2,T) = if member(e1%e2,T) then e1%e2 else e1
+Minus(e1,e2,T) = if member(e1-e2,T) then e1-e2 else e1
+
+csp-end
+
+//timed assertion A0 : AggregationSoftware is deadlock-free
+
+timed assertion A0 : Movement is deadlock-free
+//
+//timed assertion A1 : Movement is deadlock-free with 
+//	constant lv of Movement set to 1,
+//	constant av of Movement set to 1,
+//	constant MB of Movement set to 360+2,
+//	constant ^alpha of Movement set to 2 and
+//	constant K of Movement set to 1

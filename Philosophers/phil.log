@@ -1,0 +1,46 @@
+2026-02-05 11:52:06,760 - INFO - === Starting Sweep at Index 0 of 19 ===
+2026-02-05 11:52:08,048 - INFO - run_phil2.csp: [red]FAIL[/] (1.27s)
+2026-02-05 11:52:08,052 - INFO - run_phil2.csp: [red]FAIL[/] (1.27s)
+2026-02-05 11:52:08,058 - INFO - PROGRESS: 1/19 (5.3%) complete.
+2026-02-05 11:52:09,383 - INFO - run_phil3.csp: [red]FAIL[/] (1.32s)
+2026-02-05 11:52:09,391 - INFO - run_phil3.csp: [red]FAIL[/] (1.32s)
+2026-02-05 11:52:09,399 - INFO - PROGRESS: 2/19 (10.5%) complete.
+2026-02-05 11:52:10,754 - INFO - run_phil4.csp: [red]FAIL[/] (1.34s)
+2026-02-05 11:52:10,762 - INFO - run_phil4.csp: [red]FAIL[/] (1.34s)
+2026-02-05 11:52:10,771 - INFO - PROGRESS: 3/19 (15.8%) complete.
+2026-02-05 11:52:12,240 - INFO - run_phil5.csp: [red]FAIL[/] (1.46s)
+2026-02-05 11:52:12,248 - INFO - run_phil5.csp: [red]FAIL[/] (1.46s)
+2026-02-05 11:52:12,256 - INFO - PROGRESS: 4/19 (21.1%) complete.
+2026-02-05 11:52:14,386 - INFO - run_phil6.csp: [red]FAIL[/] (2.11s)
+2026-02-05 11:52:14,396 - INFO - run_phil6.csp: [red]FAIL[/] (2.11s)
+2026-02-05 11:52:14,408 - INFO - PROGRESS: 5/19 (26.3%) complete.
+2026-02-05 11:52:16,878 - INFO - run_phil7.csp: [red]FAIL[/] (2.45s)
+2026-02-05 11:52:16,886 - INFO - run_phil7.csp: [red]FAIL[/] (2.45s)
+2026-02-05 11:52:16,898 - INFO - PROGRESS: 6/19 (31.6%) complete.
+2026-02-05 11:52:19,662 - INFO - run_phil8.csp: [red]FAIL[/] (2.75s)
+2026-02-05 11:52:19,672 - INFO - run_phil8.csp: [red]FAIL[/] (2.75s)
+2026-02-05 11:52:19,686 - INFO - PROGRESS: 7/19 (36.8%) complete.
+2026-02-05 11:52:22,878 - INFO - run_phil9.csp: [red]FAIL[/] (3.17s)
+2026-02-05 11:52:22,890 - INFO - run_phil9.csp: [red]FAIL[/] (3.17s)
+2026-02-05 11:52:22,901 - INFO - PROGRESS: 8/19 (42.1%) complete.
+2026-02-05 11:52:26,975 - INFO - run_phil10.csp: [red]FAIL[/] (4.05s)
+2026-02-05 11:52:26,980 - INFO - run_phil10.csp: [red]FAIL[/] (4.05s)
+2026-02-05 11:52:26,984 - INFO - PROGRESS: 9/19 (47.4%) complete.
+2026-02-05 11:52:35,759 - INFO - run_phil11.csp: [red]FAIL[/] (8.77s)
+2026-02-05 11:52:35,771 - INFO - run_phil11.csp: [red]FAIL[/] (8.77s)
+2026-02-05 11:52:35,781 - INFO - PROGRESS: 10/19 (52.6%) complete.
+2026-02-05 11:53:09,630 - INFO - run_phil12.csp: [red]FAIL[/] (33.83s)
+2026-02-05 11:53:09,635 - INFO - run_phil12.csp: [red]FAIL[/] (33.83s)
+2026-02-05 11:53:09,640 - INFO - PROGRESS: 11/19 (57.9%) complete.
+2026-02-05 11:56:21,513 - INFO - run_phil13.csp: [red]FAIL[/] (191.86s)
+2026-02-05 11:56:21,522 - INFO - run_phil13.csp: [red]FAIL[/] (191.86s)
+2026-02-05 11:56:21,530 - INFO - PROGRESS: 12/19 (63.2%) complete.
+2026-02-05 12:16:39,985 - INFO - run_phil14.csp: [red]FAIL[/] (1218.44s)
+2026-02-05 12:16:39,991 - INFO - run_phil14.csp: [red]FAIL[/] (1218.44s)
+2026-02-05 12:16:39,996 - INFO - PROGRESS: 13/19 (68.4%) complete.
+2026-02-05 14:21:50,325 - INFO - run_phil15.csp: [red]FAIL[/] (7510.32s)
+2026-02-05 14:21:50,331 - INFO - run_phil15.csp: [red]FAIL[/] (7510.32s)
+2026-02-05 14:21:50,335 - INFO - PROGRESS: 14/19 (73.7%) complete.
+2026-02-06 03:14:39,451 - INFO - run_phil16.csp: [red]FAIL[/] (46369.11s)
+2026-02-06 03:14:39,462 - INFO - run_phil16.csp: [red]FAIL[/] (46369.11s)
+2026-02-06 03:14:39,472 - INFO - PROGRESS: 15/19 (78.9%) complete.

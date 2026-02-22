@@ -1,0 +1,29 @@
+{
+    "copyright_notice": "FDR Version 4.2.7 copyright 2016 Oxford University Innovation Ltd. All Rights Reserved.",
+    "license_type": "Academic license for non-commercial use only",
+    "results": [
+        {
+            "assertion_string": "prioritise(let id__ = 0\n           within\n               Movement::D__(id__, const_Movement_lv, const_Movement_av,\n                             const_Movement_MB, const_Movement_alpha,\n                             const_Movement_K) [[tock <- tock, tock <- tock']],\n           <diff(Events, {tock', tock}), {tock}>)\n\\ {tock}\n    :[divergence free [FD]]",
+            "errors": [],
+            "is_negated": 0,
+            "result": 1,
+            "visited_states": 2622626,
+            "visited_transitions": 5232583,
+            "visited_plys": 3850,
+            "counterexamples": []
+        }
+    ],
+    "print_statement_results": [],
+    "file_name": "run_av45_lv1_alpha8_K8_D2.csp",
+    "event_map": {},
+    "warnings": [],
+    "errors": [],
+    "time": 117.26676533499267,
+    "parameters": {
+        "av": 45,
+        "lv": 1,
+        "alpha": 8,
+        "K": 8,
+        "D": 2
+    }
+}
