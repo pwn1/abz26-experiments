@@ -1,0 +1,263 @@
+language ESSENCE' 1.0
+
+$ An abstraction for the Alpha Algorithm
+$ Victoria Johnson, Felix Ulrich-Oltean & Peter Nightingale
+$ University of York, 2025
+
+$ Assumptions: 
+$ One controller, no shared variables
+$ We do have incoming trigger events, random numbers, timer. 
+
+letting state1 = 1
+letting state2 = 2
+
+$ __Retrieve parameters from AA.param:__
+$ horizon: Number of possible movements
+$ MB: Soft limit on how long the robot can ge before checking and turning
+$ nSm: Number of possible states
+$ nTm: Number of possible transitions
+$ movTT: Movement transition table
+$ max_av: Maximum angular velocity possible
+$ max_lambda: Maximum lambda value 
+$ max_timings: maximum time an action can take
+given horizon: int
+given horizon2: int $ how many transitions the robot is deadlocked for
+given D: int
+
+
+given alpha: int
+given av: int
+given max_lambda: int
+
+letting MB = (360/av)+D
+letting max_timings = max([(max_lambda*360)/(av*max_lambda), 180/av, (360/av)+D])
+
+letting movTT = [[1, 1, 2], $ Robot transition table (movement)
+				[2, 2, 1], 
+				[1, 3, 3], 
+				[3, 4, 1], 
+				[2, 5, 3], 
+				[3, 6, 2], 
+				[1, 7, 5], 
+				[2, 8, 5], 
+				[3, 9, 5], 
+				[1, 10, 4], 
+				[2, 11, 4], 
+				[3, 12, 4], 
+				[4, 13, 1], 
+				[5, 14, 1], 
+				[4, 15, 2], 
+				[5, 16, 2], 
+				[4, 17, 3], 
+				[5, 18, 3],
+				[1, 19, 1], $ Looping transitions 19-23 to encode passage of time
+				[2, 20, 2],
+				[3, 21, 3],
+				[4, 22, 4],
+				[5, 23, 5]]
+
+letting nTm = 23  $ Number of transitions
+letting nSm = 5	  $ Number of states (movement)
+
+$ The set of time transitions.
+letting time_t={19,20,21,22,23}
+
+$ __Find the following: The states of the robot and the transitions on the robot:__
+$ Smov: State of robot (movement)  
+$ Tmov: Transition on robot (movement)
+$ nDet: Number of other robots detected
+$ sensor: what the robot's sensor can see
+$ timings: The time it takes each movement to complete
+$ lambda: Equivalent to RNG (i.e. random() )
+$ CMT: Cumulative move time
+$ trigger: Transitions i on robot p at timestep k
+$ av: Angular velocity of movements
+find Smov: matrix[int(1..horizon)] of int(1..nSm)
+find Tmov: matrix[int(1..horizon - 1)] of int(1..nTm)
+find nDet: matrix[int(1..horizon)] of int(0,alpha-1, alpha, alpha+1)
+find sensor: matrix[int(1..horizon)] of int(-1, 0, 1)
+
+$ Clocks
+find timings: matrix[int(1..horizon)] of int(1..max_timings)   $ Time required for a transition.
+find cumulTime: matrix[int(1..horizon)] of int(0..max_timings*horizon) $ cumulTime[r,t] is the accumulated time at the beginning of step t. 
+find MBC: matrix[int(1..horizon)] of int(0..max_timings*horizon)       $ Clock, may be reset to be equal to cumulTime (otherwise carried forward). 
+
+$ Random number
+find lambda: matrix[int(1..horizon)] of int(0..max_lambda)
+
+$ 
+
+find guard: matrix[int(1..horizon), int(1..nTm)] of bool
+find trigger: matrix[int(1..horizon), int(1..nTm)] of bool
+
+such that
+
+$ Start from forward motion. 
+Smov[1] = 1,
+MBC[1]=0,
+cumulTime[1]=0,
+
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ ----------------------------- Below is the protocol we are testing ------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+
+$ Movement protocol
+forAll k: int(1..horizon - 1).
+	and([
+		table([Smov[k], Tmov[k], Smov[k + 1]], movTT),
+		
+		$  If a transition is taken, the guard and trigger must both be true. 
+		forAll transition : int(1..nTm). (
+			Tmov[k] = transition -> (guard[k,transition] /\ trigger[k,transition])
+		),
+
+		$ Have a looping transition for each state. If (guard /\ trigger) is true for any non-looping 
+		$ transition then the looping transition is disallowed. 
+		$ Encodes maximal progress assumption. 
+		forAll t1 : int(1..nTm). (
+			((t1 in time_t) /\  $ t1 is a time transition.
+			exists t2 : int(1..nTm) . (
+				movTT[t1,1]=movTT[t2,1] /\    $  The two transitions have the same source state
+				(! (t2 in time_t)) /\   $  Second transition is not a time transition
+				guard[k,t2] /\ trigger[k,t2]   $  Second transition can happen. 
+			)) -> Tmov[k]!=t1
+		)
+		$ Self-transitions can have triggers and guards
+	]),
+
+$ Clocks
+forAll k: int(2..horizon).
+	cumulTime[k] = cumulTime[k-1]+timings[k-1],
+
+$ Carry forward MBC clock value, unless we have entered a turning state (in which case reset the clock)
+$ Ideally should be linked to transitions rather than states. 
+forAll k: int(2..horizon).
+	((Smov[k] in {1,2,3}) -> MBC[k]=MBC[k-1]) /\
+	((Smov[k] in {4,5}) -> MBC[k]=cumulTime[k]),
+
+$ Movement timings & reset clock when in Turning states
+forAll k: int(1..horizon).
+	and([
+		(Smov[k] in {2,3,5}) -> (timings[k] = (lambda[k]*360)/(av*max_lambda)),
+		Smov[k] = 4 -> timings[k] = 180/av,
+		(Smov[k] = 1) -> timings[k] = 1,   $ No 'wait' instruction in this state, default to 1. 
+	]),
+
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------- trigger (transition available) constraints ------------------
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ For each transition, define exactly when it is available through the guard variable, and when
+$ triggered. 
+
+$ MB has to be greater than 360/av
+
+forAll k: int(1..horizon).
+	and([
+		guard[k, 1]  <-> (Smov[k]=1 /\ (cumulTime[k]-MBC[k] < MB - 360/av)),
+		guard[k, 2]  <-> (Smov[k]=2),
+		guard[k, 3]  <-> (Smov[k]=1 /\ (cumulTime[k]-MBC[k] < MB - 360/av)),
+		guard[k, 4]  <-> (Smov[k]=3),
+		guard[k, 5]  <-> (Smov[k]=2),
+		guard[k, 6]  <-> (Smov[k]=3),
+		guard[k, 7]  <-> (Smov[k]=1 /\ (cumulTime[k]-MBC[k] >= MB) /\ nDet[k] >= alpha),
+		guard[k, 8]  <-> (Smov[k]=2 /\ (cumulTime[k]-MBC[k] >= MB) /\ nDet[k] >= alpha),
+		guard[k, 9]  <-> (Smov[k]=3 /\ (cumulTime[k]-MBC[k] >= MB) /\ nDet[k] >= alpha),
+		guard[k, 10] <-> (Smov[k]=1 /\ (cumulTime[k]-MBC[k] >= MB) /\ nDet[k] < alpha),
+		guard[k, 11] <-> (Smov[k]=2 /\ (cumulTime[k]-MBC[k] >= MB) /\ nDet[k] < alpha),
+		guard[k, 12] <-> (Smov[k]=3 /\ (cumulTime[k]-MBC[k] >= MB) /\ nDet[k] < alpha),
+		guard[k, 13] <-> (Smov[k]=4),      $ 4 -> 1 if sensor = 0
+		guard[k, 14] <-> (Smov[k]=5),      $ 5 -> 1 if sensor = 0
+		guard[k, 15] <-> (Smov[k]=4),
+		guard[k, 16] <-> (Smov[k]=5),
+		guard[k, 17] <-> (Smov[k]=4),
+		guard[k, 18] <-> (Smov[k]=5),
+		guard[k, 19] <-> (Smov[k]=1),      $ Looping transitions 19-23 are always available. 
+		guard[k, 20] <-> (Smov[k]=2),
+		guard[k, 21] <-> (Smov[k]=3),
+		guard[k, 22] <-> (Smov[k]=4),
+		guard[k, 23] <-> (Smov[k]=5),
+
+		trigger[k, 1]  <-> (sensor[k] = 1),	 	$ Turn left if obstacle detected to right
+		trigger[k, 2]  <-> (true),	 	$ Move forward if no obstacle detected
+		trigger[k, 3]  <-> (sensor[k] = -1), 	$ Turn right if obstacle detected to left
+		trigger[k, 4]  <-> (true),	 	$ Move forward if no obstacle detected
+		trigger[k, 5]  <-> (sensor[k] = -1), 	$ Turn right if obstacle detected to left
+		trigger[k, 6]  <-> (sensor[k] = 1),  	$ Turn left if obstacle detected to right
+		trigger[k, 7]  <-> (true),
+		trigger[k, 8]  <-> (true),
+		trigger[k, 9]  <-> (true),
+		trigger[k, 10] <-> (true),
+		trigger[k, 11] <-> (true),
+		trigger[k, 12] <-> (true),
+		trigger[k, 13] <-> (true),
+		trigger[k, 14] <-> (true),
+		trigger[k, 15] <-> (sensor[k] = 1),
+		trigger[k, 16] <-> (sensor[k] = 1),
+		trigger[k, 17] <-> (sensor[k] = -1),
+		trigger[k, 18] <-> (sensor[k] = -1),
+		trigger[k, 19] <-> (true),
+		trigger[k, 20] <-> (true),
+		trigger[k, 21] <-> (true),
+		trigger[k, 22] <-> (true),
+		trigger[k, 23] <-> (true),
+
+	]),
+
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ --------------------------------------- Testing conditions --------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+
+$ Check all states can be entered
+$ exists k: int(1..horizon).
+	$ Smov[k] = 1,
+	
+$ exists k: int(1..horizon).
+	$ Smov[k] = 2,
+	
+$ exists k: int(1..horizon).
+	$ Smov[k] = 3,
+
+exists k: int(1..horizon).
+	Smov[k] = 4,
+	
+$ exists k: int(1..horizon).
+	$ Smov[k] = 5,
+
+$ Test for a trace that leads to deadlock within the horizon.
+$ System is deadlocked when all _guards_ of non-looping transitions are false. 
+$ System is _not_ deadlocked whenever a transition is available, regardless of whether the transition is triggered.
+
+$ First case: all guards false at a particular timestep. 
+false->
+exists t: int(1..horizon).
+	forAll transition: int(1..nTm).
+		movTT[transition,1]!=movTT[transition,3] ->    $ For non-looping transitions...
+			!guard[t, transition],
+
+$ Second case: all guards false at a particular timestep, and remain false for horizon2 transitions. 
+true->
+exists t: int(1..horizon-horizon2+1).
+	forAll transition: int(1..nTm).
+		(!(transition in time_t)) ->    $ For non-time transitions
+			forAll t2 : int(t..t+horizon2-1). 
+				!guard[t2, transition],
+
+$ Check a state can be entered and then return to the initial state
+false ->
+exists k: int(1..horizon).
+	exists b: int(1..horizon).
+		exists q: int(1..horizon).
+			Smov[k] = state1 /\ Smov[k + b] = state2 /\ Smov[k + b + q] = state1,
+	
+true
+
+
+$ with h=82, h2=72, D somewhere between 400 and 800, it stops finding solutions. 
+$ some weird thing where you need to get the time to be exactly (?) equal to MB - 360/av at the start of the run of "19" transitions. Granularity of lambda is not fine enough to do that. 
+$ it doesn't look like a bug as long as we're happy with the lambda mechanism. 
