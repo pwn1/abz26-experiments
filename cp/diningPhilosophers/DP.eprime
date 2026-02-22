@@ -1,0 +1,152 @@
+language ESSENCE' 1.0
+
+$ Constant declarations
+$letting horizon = 8  	$ Horizon length
+$letting nP = 5			$ Number of philosophers
+given nP : int(1..)
+given horizon : int(1..)
+letting nTp = 8			$ Number of philosopher transitions
+letting nTf = 7			$ Number of fork transitions
+
+letting left = [ i | i: int(1..nP)]
+letting right = [(i - 2)%nP + 1 | i: int(1..nP)]
+letting leftLeft = [i%nP + 1 | i: int(1..nP)]
+
+$ Philosophers 
+$ Sp: State of philosopher;  Tp: Transition on philosopher
+find Sp: matrix[int(1..nP), int(1..horizon)] of int(1..4)
+find Tp: matrix[int(1..nP), int(1..horizon - 1)] of int(1..8)
+
+$ Forks 
+$ Sf: State of fork;  Tf: Transition on fork
+find Sf: matrix[int(1..nP), int(1..horizon)] of int(1..3)
+find Tf: matrix[int(1..nP), int(1..horizon - 1)] of int(1..7)
+
+$ Beta variables
+$ guard_p: Transitions i on philosopher p at timestep k
+$ guard_f: Transitions i on fork p at timestep k
+find guard_p: matrix[int(1..nP), int(1..horizon - 1), int(1..nTp)] of bool
+find guard_f: matrix[int(1..nP), int(1..horizon - 1), int(1..nTf)] of bool
+
+letting philTT = [[1, 1, 2], [2, 2, 3], [3, 3, 4], [4, 4, 1], [1, 5, 1], [2, 6, 2], [3, 7, 3], [4, 8, 4]]
+letting forkTT = [[1, 1, 2], [2, 2, 1], [1, 3, 3], [3, 4, 1], [1, 5, 1], [2, 6, 2], [3, 7, 3]]
+
+letting philNotLoops = { philTT[i, 2] | i : indexOf(philTT), philTT[i,1] != philTT[i,3] }
+letting forkNotLoops = { forkTT[i, 2] | i : indexOf(forkTT), forkTT[i,1] != forkTT[i,3] }
+
+such that 
+
+$ Initial conditions
+forAll i: int(1..nP).
+    Sp[i, 1] = 1 /\ Sf[i, 1] = 1,
+
+$ Table constraints for philosophers --------------------------------------------------------------
+$ State 1: Thinking                     State 3: Hungry + locked left fork
+$ State 2: Hungry + no forks			State 4: Locked left and right forks, eating
+
+$ Transitions:
+$ Transition 1: 1 -> 2      Transition 5: 1 -> 1 
+$ Transition 2: 2 -> 3      Transition 6: 2 -> 2 
+$ Transition 3: 3 -> 4      Transition 7: 3 -> 3
+$ Transition 4: 4 -> 1		Transition 8: 4 -> 4 
+
+forAll k: int(1..horizon - 1).
+    forAll p: int(1..nP).
+        table([Sp[p, k], Tp[p, k], Sp[p, k + 1]], philTT),
+
+$ Table constraints for forks ---------------------------------------------------------------------
+$ State 1: Fork unused
+$ State 2: Fork owned by left philosopher
+$ State 3: Fork owned by right philosopher 
+
+$ Transitions:
+$ Transition 1: 1 -> 2		Transition 5: 1 -> 1			
+$ Transition 2: 2 -> 1		Transition 6: 2 -> 2
+$ Transition 3: 1 -> 3		Transition 7: 3 -> 3
+$ Transition 4: 3 -> 1
+forAll k: int(1..horizon - 1).
+    forAll p: int(1..nP).
+		table([Sf[p, k], Tf[p, k], Sf[p, k + 1]], forkTT),
+
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ ----------------------------- Below is the protocol we are testing ------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+
+$ Philosopher/fork synchronisation
+forAll k: int(1..horizon - 1).
+	forAll p: int(1..nP).
+		and([
+			(Tp[p, k] = 2 <-> Tf[left[p], k] = 3),
+			(Tp[p, k] = 3 <-> Tf[right[p], k] = 1),
+			(Tp[p, k] = 4 <-> Tf[right[p], k] = 2),
+			(Tp[p, k] = 4 <-> Tf[left[p], k] = 4),
+		]),
+
+$ "Translate" fork transition to bool variable
+forAll p: int(1..nP).
+	forAll k: int(1..horizon - 1).
+		forAll j: int(1..nTf).
+			(Tf[p, k] = j -> guard_f[p, k, j]),
+
+$ Philosopher actual transition connect to 'transition available' variable
+forAll p: int(1..nP).
+	forAll k: int(1..horizon - 1).
+		forAll j: int(1..nTp).
+			(Tp[p, k] = j -> guard_p[p, k, j]),
+
+$ Adding "transition available" values to guard_p (philosophers)
+forAll p: int(1..nP).
+	forAll k: int(1..horizon - 1).
+		and([
+			(guard_p[p, k, 1] <-> Sp[p, k] = 1),
+			(guard_p[p, k, 2] <-> (Sp[p, k] = 2 /\ guard_f[left[p], k, 3])),
+			(guard_p[p, k, 3] <-> (Sp[p, k] = 3 /\ guard_f[right[p], k, 1])),
+			(guard_p[p, k, 4] <-> Sp[p, k] = 4),
+			(guard_p[p, k, 5] <-> Sp[p, k] = 1),
+			(guard_p[p, k, 6] <-> Sp[p, k] = 2),
+			(guard_p[p, k, 7] <-> Sp[p, k] = 3),
+			(guard_p[p, k, 8] <-> Sp[p, k] = 4),
+		]),
+
+$ Adding "transition available" values to guard_f (forks)
+forAll p: int(1..nP).
+	forAll k: int(1..horizon - 1).
+		and([
+			(guard_f[p, k, 1] <-> (Sf[p, k] = 1 /\ guard_p[leftLeft[p], k, 3])),
+			(guard_f[p, k, 2] <-> (Sf[p, k] = 2 /\ guard_p[leftLeft[p], k, 4])),
+			(guard_f[p, k, 3] <-> (Sf[p, k] = 1 /\ guard_p[left[p], k, 2])),
+			(guard_f[p, k, 4] <-> (Sf[p, k] = 3 /\ guard_p[left[p], k, 4])),
+			(guard_f[p, k, 5] <->  Sf[p, k] = 1),
+			(guard_f[p, k, 6] <->  Sf[p, k] = 2),
+			(guard_f[p, k, 7] <->  Sf[p, k] = 3),
+		]),
+
+
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ --------------------------------------- Testing conditions --------------------------------------
+$ -------------------------------------------------------------------------------------------------
+$ -------------------------------------------------------------------------------------------------
+
+$ Can we complete a full cycle for all philosophers?
+$forAll p: int(1..nP). exists k: int(1..horizon). Sp[p, k] = 4,
+	
+$ Can transition/state n happen?
+$exists k: int(1..horizon - 1). Tp[1, k] = 8,
+
+$ Can we identify the deadlock?
+exists k: int(horizon - 1). (
+	(forAll p: int(1..nP). forAll transition : philNotLoops. !guard_p[p, k, transition]) /\
+ 	(forAll p: int(1..nP). forAll transition : forkNotLoops. !guard_f[p, k, transition])
+	),
+
+$forAll p: int(1..nP). Sp[p, 7] = 7,
+$exists k: int(1..horizon). forAll p: int(1..nP). (Sf[p, k] = 3),
+
+$ Does starvation happen?
+$exists p: int(1..nP). forAll k: int(1..horizon). Sp[p, k] != 4,
+$forAll p: int(1..nP). exists k: int(1..horizon-5). Sp[p, k] != 1,
+
+true
