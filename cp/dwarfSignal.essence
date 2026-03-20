@@ -1,0 +1,104 @@
+language ESSENCE 1.3.0
+
+$  The dwarf signal example. 
+
+given horizon : int(1..)
+
+$ At each timestep the set of lamps that is lit. 
+find currentState : matrix [int(1..horizon)] of set of int(1..3)
+
+$ Other parts of the model of the signal. 
+find lastProperState : matrix [int(1..horizon)] of set of int(1..3)
+find turnOff : matrix [int(1..horizon)] of set of int(1..3)
+find turnOn : matrix [int(1..horizon)] of set of int(1..3)
+find desiredProperState : matrix [int(1..horizon)] of set of int(1..3)
+
+$  Action is either turnoff : 0, turnon : 1, setnewproperstate: 2
+$  with parameters lampId or newDesiredState
+find action : matrix [ int(1..horizon-1) ] of int(0..2)
+find actionLampId : matrix [ int(1..horizon-1) ] of int(1..3)
+find newDesiredState : matrix [ int(1..horizon-1) ] of set of int(1..3)
+
+letting stop be {1,2}
+letting warning be {1,3}
+letting drive be {2,3}
+letting dark be {}
+
+such that
+
+$ Safe initial state of 'stop'
+
+currentState[1]={1,2},
+lastProperState[1]={1,2},
+turnOff[1]={},
+turnOn[1]={},
+desiredProperState[1]={1,2},
+
+$ Implement the actions.
+
+forAll t : int(1..horizon-1) . and([
+  $ Turn off a lamp
+  action[t]=0 -> and([ 
+    actionLampId[t] in turnOff[t],
+    lastProperState[t+1]=lastProperState[t],
+    turnOff[t+1]=turnOff[t]-{actionLampId[t]},
+    turnOn[t+1]=turnOn[t],
+    currentState[t+1]=currentState[t]-{actionLampId[t]},
+    desiredProperState[t+1]=desiredProperState[t]
+  ]),
+  $ Turn on a lamp
+  action[t]=1 -> and([
+    actionLampId[t] in turnOn[t],
+    lastProperState[t+1]=lastProperState[t],
+    turnOff[t+1]=turnOff[t],
+    turnOn[t+1]=turnOn[t]-{actionLampId[t]},
+    currentState[t+1]=currentState[t] union {actionLampId[t]},
+    desiredProperState[t+1]=desiredProperState[t]
+  ]),
+  $ Set a new desired state. 
+  action[t]=2 -> and([
+    currentState[t]=desiredProperState[t],
+    newDesiredState[t]!=currentState[t],
+    lastProperState[t+1]=currentState[t],
+    turnOff[t+1]=currentState[t]-newDesiredState[t],
+    turnOn[t+1]=newDesiredState[t]-currentState[t],
+    currentState[t+1]=currentState[t],
+    desiredProperState[t+1]=newDesiredState[t]
+  ])
+]),
+
+$ Fix unused action parameters for efficiency
+forAll t: int(1..horizon-1). and([
+  action[t]=2 -> actionLampId[t]=1,
+  action[t]!=2 -> newDesiredState[t]={}
+]),
+
+$ 'new desired state' (i.e. the parameter of action 3) must always be
+$ a proper state.
+forAll t : int(1..horizon-1) . or([
+  newDesiredState[t]={},
+  newDesiredState[t]={1,2},
+  newDesiredState[t]={1,3},
+  newDesiredState[t]={2,3}
+]),
+
+$ ------------------------------------------------------------------------
+$ ---- Invariants 
+
+false ->
+!forAll t: int(2..horizon). 
+  exists l : int(1..3). (
+    currentState[t] = currentState[t-1] union {l} \/
+    currentState[t-1] = currentState[t] union {l} \/
+    currentState[t-1]=currentState[t]
+  ),
+
+$ negation of an invariant -- never have all lamps on simultaneously (NeverShowAll)
+false->
+!forAll t: int(1..horizon) . currentState[t]!={1,2,3},
+
+$ ForbidStopToDrive
+true->
+!forAll t: int(1..horizon) . lastProperState[t]=stop -> desiredProperState[t]!=drive,
+
+true
